@@ -14,6 +14,7 @@
 # production
 /build
 /dist
+/.husky
 
 # types & source maps
 **.d.ts
@@ -30,6 +31,8 @@
 !tsconfig.json
 !package.json
 !package-lock.json
+!options.json
+!commitlint.config.js
 
 # misc
 .DS_Store
