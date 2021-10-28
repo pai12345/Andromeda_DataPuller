@@ -24,6 +24,13 @@
 **.js
 **.js.map
 **.html
+**.css
+**.scss
+**.img
+**.jpg
+**.xl
+**.csv
+**.pdf
 
 # exceptions
 !webpack.config.js
