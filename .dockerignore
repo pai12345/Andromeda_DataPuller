@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.husky/
+
+# Workflow
+.github/
+
+# Scripts
+scripts/
+**.sh
+
+# Source
+src/
+
+# Env Files
+.env
+
+# git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+
+# Jenkins
+Jenkinsfile
+
+# Misc
+README.md
+LICENSE.md
+.DS_Store
+
+# Config
+tsconfig.json
+commitlint.config.js
+options.json
+
+# Webpack
+webpack.config.js
+webpack.config.prod.js
