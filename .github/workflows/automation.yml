@@ -1,9 +1,11 @@
 name: Automation Workflow
 on:
   push:
-  pull_request:
     branches:
-      - "develop"
+      - feature/**
+  pull_request:
+    branches: 
+        - develop
 jobs:
   BUILD:
     runs-on: ubuntu-20.04
@@ -25,7 +27,11 @@ jobs:
         with:
           node-version: '16'
           cache: 'npm'
-      - name: install dependencies & audit checks
+      - name: install npm dependencies
         run: npm install
-      - name: lint branch
+      - name: lint git branch
         run: npx branch-name-lint options.json
+      - name: lint source code
+        run: npm run lint
+       
+        
