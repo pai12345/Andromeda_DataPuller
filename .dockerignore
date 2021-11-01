@@ -19,6 +19,9 @@ src/
 .git
 .gitignore
 
+#eslint
+.eslintrc
+
 # Docker
 Dockerfiles
 
