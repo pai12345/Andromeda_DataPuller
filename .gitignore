@@ -40,6 +40,8 @@
 !package-lock.json
 !options.json
 !commitlint.config.js
+!.eslintrc
+!.eslintignore
 
 # misc
 .DS_Store
