@@ -33,5 +33,7 @@ jobs:
         run: npx branch-name-lint options.json
       - name: lint source code
         run: npm run lint
+      - name: run app
+        run: npm run prod
        
         
