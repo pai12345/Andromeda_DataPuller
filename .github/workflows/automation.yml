@@ -33,6 +33,8 @@ jobs:
         run: npx branch-name-lint options.json
       - name: lint source code
         run: npm run lint
+      - name: lint docker code
+        run: npx dockerfilelint Dockerfile
       - name: check app build
         run: npm run build-prod
        

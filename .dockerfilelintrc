@@ -1,0 +1,18 @@
+rules:
+    required_params: on
+    uppercase_commands: on
+    from_first: on
+    invalid_line: on
+    sudo_usage: on
+    invalid_port: on
+    invalid_command: on
+    expose_host_port: on
+    label_invalid: on
+    missing_tag: on
+    latest_tag: on
+    extra_args: on
+    missing_args: on
+    add_src_invalid: on
+    add_dest_invalid: on
+    invalid_workdir: on
+    invalid_format: on
