@@ -22,6 +22,12 @@ jobs:
           configFile: "./commitlint.config.js"
           firstParent: true
           failOnWarnings: true
+      - name: cache dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: | 
+            ${{ runner.os }}-node-
       - name: setup node
         uses: actions/setup-node@v2.4.1
         with:
