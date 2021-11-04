@@ -2,8 +2,9 @@ import express, { json } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
-import welcomepage from "../components/router/welcome";
+import commerce from "../components/router/commerce";
 import generateEnv from "../config/config"
+import middleware from "../components/middleware/middleware";
 
 /**
  * Class - Server
@@ -18,7 +19,10 @@ class Server {
     app.use(helmet());
     app.use(compression());
 
-    app.use("/", welcomepage);
+    app.use("/api/", commerce);
+    
+    //Custom Middelwares
+    app.use(middleware().route_middleware);
     return app;
   }
   initialise_server() {
