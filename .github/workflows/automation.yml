@@ -6,6 +6,10 @@ on:
   pull_request:
     branches:
       - develop
+env:
+  CUST_REPOSITORY_ENV: ${{ github.repository }}
+  CUST_BRANCH_ENV: ${{ github.ref }}
+
 jobs:
   BUILD:
     name: BUILD
@@ -14,8 +18,8 @@ jobs:
       - name: clone repo
         uses: actions/checkout@v2.3.5
         with:
-          repository: ${{ github.repository }}
-          ref: ${{ env.branch }}
+          repository: ${{ env.CUST_REPOSITORY_ENV }}
+          ref: ${{ env.CUST_BRANCH_ENV }}
           fetch-depth: 1
       - name: lint commits
         uses: wagoid/commitlint-github-action@v4
@@ -23,58 +27,68 @@ jobs:
           configFile: "./commitlint.config.js"
           firstParent: true
           failOnWarnings: true
-      - name: cache dependencies
-        uses: actions/cache@v2.1.6
-        with:
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          path: |
-            ${{ runner.os }}-node-
       - name: setup node
         uses: actions/setup-node@v2.4.1
         with:
           node-version: "16"
           cache: "npm"
+      - name: cache dependencies
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: install npm dependencies
         run: npm install
+        shell: bash
       - name: lint git branch
         run: npx branch-name-lint options.json
+        shell: bash
       - name: lint source code
         run: npm run lint
+        shell: bash
       - name: lint docker code
         run: npx dockerfilelint Dockerfile
+        shell: bash
       - name: check app build
         run: npm run build-prod
-  STAGING:
-    name: STAGING
-    runs-on: ubuntu-20.04
-    needs: BUILD
-    steps:
-      - name: clone repo
-        uses: actions/checkout@v2.3.5
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          fetch-depth: 1
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
-  DEPLOY:
-    name: DEPLOY
-    runs-on: ubuntu-20.04
-    needs: STAGING
-    steps:
-      - name: Login Container Registry
-        run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password-stdin<<<'${{ secrets.DOCKERHUB_TOKEN }}'
-      - name: clone repo
-        uses: actions/checkout@v2.3.5
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          fetch-depth: 1
-      - name: Build Container Image
-        run: docker build -t andromeda:latest . --compress
-      - name: Tag Container Image
-        run: docker tag andromeda:latest dockerdemopai/andromeda:v0.0.1
-      - name: Push to Container Registry
-        run: docker push dockerdemopai/andromeda:v0.0.1
+        shell: bash
+  # STAGING:
+  #   name: STAGING
+  #   runs-on: ubuntu-20.04
+  #   needs: BUILD
+  #   steps:
+  #     - name: clone repo
+  #       uses: actions/checkout@v2.3.5
+  #       with:
+  #         repository: ${{ env.CUST_REPOSITORY_ENV }}
+  #         ref: ${{ env.CUST_BRANCH_ENV }}
+  #         fetch-depth: 1
+  #     - name: Run Snyk to check for vulnerabilities
+  #       uses: snyk/actions/node@master
+  #       env:
+  #         SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
+  # DEPLOY:
+  #   name: DEPLOY
+  #   runs-on: ubuntu-20.04
+  #   needs: STAGING
+  #   steps:
+  #     - name: Login Container Registry
+  #       run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password-stdin<<<'${{ secrets.DOCKERHUB_TOKEN }}'
+  #       shell: bash
+  #     - name: clone repo
+  #       uses: actions/checkout@v2.3.5
+  #       with:
+  #         repository: ${{ env.CUST_REPOSITORY_ENV }}
+  #         ref: ${{ env.CUST_BRANCH_ENV }}
+  #         fetch-depth: 1
+  #     - name: Build Container Image
+  #       run: docker build -t andromeda:latest . --compress
+  #       shell: bash
+  #     - name: Tag Container Image
+  #       run: docker tag andromeda:latest dockerdemopai/andromeda:v0.0.1
+  #       shell: bash
+  #     - name: Push to Container Registry
+  #       run: docker push dockerdemopai/andromeda:v0.0.1
+  #       shell: bash
