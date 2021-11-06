@@ -1,40 +1,33 @@
-# Dependencies
-node_modules/
-.husky/
-
 # Workflow
 .github/
 
-# Scripts
-scripts/
-**.sh
+# Husky
+.husky/
 
-# Source
-src/
+# Dependencies
+node_modules/
+dist/
 
-# Env Files
-.env
+# lint files 
+.dockerfilelintrc
+.eslintignore
+.eslintrc
 
 # git
 .git
 .gitignore
 
-#eslint
-.eslintrc
+# config files
+commitlint.config.js
+options.json
 
 # Docker
 Dockerfiles
 
+# env Files
+.env
+
 # Misc
-README.md
 LICENSE.md
+README.md
 .DS_Store
-
-# Config
-tsconfig.json
-commitlint.config.js
-options.json
-
-# Webpack
-webpack.config.js
-webpack.config.prod.js
