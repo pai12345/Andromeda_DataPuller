@@ -54,22 +54,22 @@ jobs:
       - name: check app build
         run: npm run build-prod
         shell: bash
-  # STAGING:
-  #   name: STAGING
-  #   runs-on: ubuntu-20.04
-  #   needs: BUILD
-  #   steps:
-  #     - name: clone repo
-  #       uses: actions/checkout@v2.3.5
-  #       with:
-  #         repository: ${{ env.CUST_REPOSITORY_ENV }}
-  #         ref: ${{ env.CUST_BRANCH_ENV }}
-  #         fetch-depth: 1
-  #     - name: Run Snyk to check for vulnerabilities
-  #       uses: snyk/actions/node@master
-  #       env:
-  #         SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
-
+  STAGING:
+    name: STAGING
+    runs-on: ubuntu-20.04
+    # needs: BUILD
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: ${{ env.CUST_REPOSITORY_ENV }}
+          ref: ${{ env.CUST_BRANCH_ENV }}
+          fetch-depth: 1
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
+          
   # DEPLOY:
   #   name: DEPLOY
   #   runs-on: ubuntu-20.04
