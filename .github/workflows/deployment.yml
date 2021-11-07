@@ -2,7 +2,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - develop
+      - feature/**
 jobs:
   RELEASE:
     name: RELEASE
@@ -14,14 +14,16 @@ jobs:
           repository: ${{ github.repository }}
           ref: develop
           fetch-depth: 1
-      - name: Changelog
-        uses: scottbrenner/generate-changelog-action@v1.3.3
-        id: Changelog
-        env:
-          REPO: ${{ github.repository }}
+      - name: create release branch
+        run: |
+          git checkout -b release/test-branch
+          git tag v0.0.1
+          git push --set-upstream origin release/test-branch
+          git push origin v0.0.1
+        shell: bash
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -29,12 +31,6 @@ jobs:
           release_name: Release v0.0.1
           draft: false
           prerelease: false
-          repo: ${{ github.repository }}
-      - name: create release branch
-        run: |
-          git checkout -b release/test-branch
-          git push --set-upstream origin release/test-branch
-        shell: bash
   # DEPLOY:
   #   name: DEPLOY
   #   runs-on: ubuntu-20.04
