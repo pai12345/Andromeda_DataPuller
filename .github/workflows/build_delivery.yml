@@ -1,5 +1,8 @@
 name: CI/CD Workflow
 on:
+  push:
+    branches:
+        - feature/**
   pull_request:
     branches:
       - develop
