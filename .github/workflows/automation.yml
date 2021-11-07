@@ -54,58 +54,41 @@ jobs:
       - name: check app build
         run: npm run build-prod
         shell: bash
-  STAGING:
-    name: STAGING
-    runs-on: ubuntu-20.04
-    # needs: BUILD
-    steps:
-      - name: clone repo
-        uses: actions/checkout@v2.3.5
-        with:
-          repository: ${{ env.CUST_REPOSITORY_ENV }}
-          ref: ${{ env.CUST_BRANCH_ENV }}
-          fetch-depth: 1
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
-          
+  # STAGING:
+  #   name: STAGING
+  #   runs-on: ubuntu-20.04
+  #   needs: BUILD
+  #   steps:
+  #     - name: clone repo
+  #       uses: actions/checkout@v2.3.5
+  #       with:
+  #         repository: ${{ env.CUST_REPOSITORY_ENV }}
+  #         ref: ${{ env.CUST_BRANCH_ENV }}
+  #         fetch-depth: 1
+  #     - name: Run Snyk to check for vulnerabilities
+  #       uses: snyk/actions/node@master
+  #       env:
+  #         SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
   # DEPLOY:
   #   name: DEPLOY
   #   runs-on: ubuntu-20.04
   #   needs: STAGING
   #   steps:
   #     - name: Login Container Registry
-  #       uses: docker/login-action@v1.10.0
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Clone Repo
+  #       run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password-stdin<<<'${{ secrets.DOCKERHUB_TOKEN }}'
+  #       shell: bash
+  #     - name: clone repo
   #       uses: actions/checkout@v2.3.5
   #       with:
   #         repository: ${{ env.CUST_REPOSITORY_ENV }}
   #         ref: ${{ env.CUST_BRANCH_ENV }}
   #         fetch-depth: 1
-  #     - name: Cache Dependencies
-  #       uses: actions/cache@v2.1.6
-  #       with:
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
-  #     - name: Extract Metdata
-  #       id: meta
-  #       uses: docker/metadata-action@v3.6.0
-  #       with:
-  #         images: dockerdemopai/andromeda
-  #         tags: |
-  #           type=semver,pattern={{version}},value=0.0.1
-  #         flavor: |
-  #           latest=false
-  #     - name: Build and Push Image
-  #       id: docker_build
-  #       uses: docker/build-push-action@v2.7.0
-  #       with:
-  #         context: .
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
+  #     - name: Build Container Image
+  #       run: docker build -t andromeda:latest . --compress
+  #       shell: bash
+  #     - name: Tag Container Image
+  #       run: docker tag andromeda:latest dockerdemopai/andromeda:v0.0.1
+  #       shell: bash
+  #     - name: Push to Container Registry
+  #       run: docker push dockerdemopai/andromeda:v0.0.1
+  #       shell: bash
