@@ -92,3 +92,4 @@ jobs:
       - name: Push to Container Registry
         run: docker push dockerdemopai/andromeda:v0.0.1
         shell: bash
+        
