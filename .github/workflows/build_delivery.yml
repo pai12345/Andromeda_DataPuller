@@ -66,8 +66,16 @@ jobs:
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SYNK_KEY }}
-      - name: create release branch
-        run: |
-          git checkout -b release/test-branch
-          ls
+      # - name: create release branch
+      #   run: |
+      #     git checkout -b release/test-branch
+      #     ls
         shell: bash
+       # Deploy to another repo
+      - name: create release branch
+        uses: s0/git-publish-subdir-action@2.5.0
+        env:
+          REPO: https://github.com/pai12345/Andromeda_DataPuller.git
+          BRANCH: release/test-branch
+          FOLDER: ./
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
