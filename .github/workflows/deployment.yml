@@ -2,7 +2,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - feature/**
+      - develop
 jobs:
   RELEASE:
     name: RELEASE
@@ -16,17 +16,25 @@ jobs:
           fetch-depth: 0
       - name: Get Latest Tag
         id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
-      - name: Create Release Branch
-        run: |
-          git checkout -b release/test-branch
-          git push --set-upstream origin release/test-branch
-        shell: bash
+        uses: oprypin/find-latest-tag@v1.1.0
+        with:
+          repository: ${{ github.repository }}
+          releases-only: true
       - name: Get next Tag version
         id: semvers
         uses: WyriHaximus/github-action-next-semvers@v1
         with:
           version: ${{ steps.previoustag.outputs.tag }}
+      - name: Create Release Branch
+        id: create_release_branch
+        run: |
+          git checkout -b release/version/${{ steps.semvers.outputs.patch }}
+          git push --set-upstream origin release/version/${{ steps.semvers.outputs.patch }}
+          git tag ${{ steps.semvers.outputs.patch }}
+          git push origin ${{ steps.semvers.outputs.patch }}
+          mkdir -p path/artifact
+          echo release/version/${{ steps.semvers.outputs.patch }} > path/artifact/branch.txt
+        shell: bash
       - name: Generate Changelog
         id: generate_changelog
         uses: metcalfc/changelog-generator@v2.0.0
@@ -40,25 +48,44 @@ jobs:
           prerelease: false
           tag: ${{ steps.semvers.outputs.patch }}
           token: ${{ secrets.GITHUB_TOKEN }}
-  # DEPLOY:
-  #   name: DEPLOY
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - name: Login Container Registry
-  #       run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password-stdin<<<'${{ secrets.DOCKERHUB_TOKEN }}'
-  #       shell: bash
-  #     - name: clone repo
-  #       uses: actions/checkout@v2.3.5
-  #       with:
-  #         repository: ${{ github.repository }}
-  #         ref: ${{ github.ref }}
-  #         fetch-depth: 1
-  #     - name: Build Container Image
-  #       run: docker build -t andromeda:latest . --compress
-  #       shell: bash
-  #     - name: Tag Container Image
-  #       run: docker tag andromeda:latest dockerdemopai/andromeda:v0.0.1
-  #       shell: bash
-  #     - name: Push to Container Registry
-  #       run: docker push dockerdemopai/andromeda:v0.0.1
-  #       shell: bash
+      - name: Upload Data
+        uses: actions/upload-artifact@master
+        with:
+          name: release-branch
+          path: path/artifact
+  DEPLOY:
+    name: DEPLOY
+    runs-on: ubuntu-20.04
+    needs: RELEASE
+    steps:
+      - name: Download Data
+        uses: actions/download-artifact@master
+        with:
+          name: release-branch
+          path: path/artifact
+      - name: Read file
+        id: read_file
+        run: echo "::set-output name=file_name::$(cat path/artifact/branch.txt )"
+      - name: Login Container Registry
+        run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password-stdin<<<'${{ secrets.DOCKERHUB_TOKEN }}'
+        shell: bash
+      - name: Clone Repo
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ steps.read_file.outputs.file_name }}
+          fetch-depth: 1
+      - name: Build Container Image
+        run: docker build -t andromeda:latest . --compress
+        shell: bash
+      - name: Tag Container Image
+        run: docker tag andromeda:latest dockerdemopai/andromeda:v0.0.1
+        shell: bash
+      - name: Push to Container Registry
+        run: docker push dockerdemopai/andromeda:v0.0.1
+        shell: bash
+      - name: Push release to master
+        run: |
+          git push origin master
+      - name: Delete Release Branch on Repo
+        run: git push origin --delete ${{ steps.read_file.outputs.file_name }}
