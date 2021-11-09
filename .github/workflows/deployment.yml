@@ -86,6 +86,7 @@ jobs:
         shell: bash
       - name: Push release to master
         run: |
+          git config pull.rebase true
           git pull origin master --allow-unrelated-histories
           git switch master
           git merge ${{ steps.read_file.outputs.file_name }}
