@@ -2,7 +2,7 @@ name: Deployment Workflow
 on:
   push:
     branches:
-      - develop
+      - feature/**
 jobs:
   RELEASE:
     name: RELEASE
@@ -87,7 +87,7 @@ jobs:
       - name: Push release to master
         run: |
           git pull origin master --allow-unrelated-histories
-          git checkout master
+          git switch master
           git merge ${{ steps.read_file.outputs.file_name }}
           git push origin master
       - name: Delete Release Branch on Repo
