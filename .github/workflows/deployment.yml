@@ -86,6 +86,7 @@ jobs:
         shell: bash
       - name: Push release to master
         run: |
+          git pull origin master
           git push origin master
       - name: Delete Release Branch on Repo
         run: git push origin --delete ${{ steps.read_file.outputs.file_name }}
