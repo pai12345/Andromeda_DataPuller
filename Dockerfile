@@ -1,7 +1,8 @@
 # ================ Stage 1 =================#
 
 # Base image
-FROM public.ecr.aws/bitnami/node:14.18.1-prod as slim
+# FROM public.ecr.aws/bitnami/node:14.18.1-prod as slim
+FROM node:14.18.1 as slim
 
 # Create user and group
 RUN addgroup app && adduser --system --group app
@@ -23,7 +24,7 @@ RUN npm install && npm run build-prod
 USER app
 
 # ================ Stage 2 =================#
-FROM public.ecr.aws/bitnami/node:14.18.1-prod
+FROM node:14.18.1
 
 # Create user and group
 RUN addgroup app && adduser --system --group app
@@ -40,7 +41,7 @@ RUN npm install --only=prod
 USER app
 
 # Expose Port
-EXPOSE 8000
+EXPOSE 8080
 
 # Execute App
 ENTRYPOINT ["npm", "start"]
