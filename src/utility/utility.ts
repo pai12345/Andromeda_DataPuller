@@ -8,7 +8,7 @@ export enum Status_Message {
   Closing_http_server = "Closing http server",
   Http_server_closed = "Http server closed",
   WelcomeMessage = "Welcome to Andromeda",
-  NotFoundMessage = "404 Service Not Found",
+  NotFoundMessage = "Service Not Found",
 }
 
 /**
