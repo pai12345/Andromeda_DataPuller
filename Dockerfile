@@ -19,7 +19,6 @@ COPY . .
 # Install npm dependencies
 RUN npm install && npm run build-prod
 
-
 # Set user
 USER app
 
